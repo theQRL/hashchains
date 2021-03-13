@@ -1,8 +1,9 @@
 {
   "name": "@theqrl/hashchains",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "hashchains utilities",
   "main": "src/index.js",
+  "browser": "dist/hashchains.js",
   "scripts": {
     "start": "nodemon --exec babel-node ./src/index.js",
     "dev": "npm-run-all --parallel dev:lint dev:test",
@@ -63,6 +64,6 @@
     "nyc": "^15.1.0"
   },
   "dependencies": {
-    "keccak256": "^1.0.2"
+    "keccak": "^3.0.1"
   }
 }

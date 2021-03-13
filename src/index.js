@@ -1,6 +1,6 @@
 /* eslint max-classes-per-file: 0 */
 
-const keccak256 = require('keccak256')
+const keccak = require('keccak')
 
 class HashChain {
   constructor(hashRoot, hashFunction, length) {
@@ -11,7 +11,7 @@ class HashChain {
     hc.push(this.hashRoot)
     for (let i = 0; i < this.length; i += 1) {
       if (this.hashFunction === 'keccak256') {
-        hc.push(keccak256(`${hc[i]}`).toString('hex'))
+        hc.push(keccak('keccak256').update(`${hc[i]}`).digest('hex'))
       } else {
         throw new Error('hash function not implemented')
       }
@@ -32,7 +32,9 @@ class HashChains {
     let hashRoot = null
     for (let i = 0; i < chainsToMake; i += 1) {
       if (this.hashFunction === 'keccak256') {
-        hashRoot = keccak256(`${mnemonic}${startingIndex + i}`).toString('hex')
+        hashRoot = keccak('keccak256')
+          .update(`${mnemonic}${startingIndex + i}`)
+          .digest('hex')
       } else {
         throw new Error('hash function not implemented')
       }
