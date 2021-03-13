@@ -1,9 +1,8 @@
 {
   "name": "@theqrl/hashchains",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "hashchains utilities",
   "main": "./src/index.js",
-  "type": "module",
   "module": "./src/index.js",
   "exports": {
     "import": "./src/index.js",
