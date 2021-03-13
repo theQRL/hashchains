@@ -10410,7 +10410,7 @@ class HashChain {
   constructor(hashRoot, hashFunction, length) {
     this.hashRoot = hashRoot
     this.hashFunction = hashFunction || 'keccak256'
-    this.length = length || 64
+    this.length = parseInt(length, 10) || 64
     const hc = []
     hc.push(this.hashRoot)
     for (let i = 0; i < this.length; i += 1) {
@@ -10428,9 +10428,9 @@ class HashChain {
 class HashChains {
   constructor(mnemonic, numberToCreate, index, hashFunction, length) {
     this.hashFunction = hashFunction || 'keccak256'
-    this.length = length || 64
-    const startingIndex = index || 0
-    const chainsToMake = numberToCreate || 2
+    this.length = parseInt(length, 10) || 64
+    const startingIndex = parseInt(index, 10) || 0
+    const chainsToMake = parseInt(numberToCreate, 10) || 2
     const hashChains = []
     const hashChainRoots = []
     let hashRoot = null
