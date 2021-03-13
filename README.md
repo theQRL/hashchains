@@ -1,0 +1,5 @@
+# hashchains
+
+WIP
+
+README placeholder

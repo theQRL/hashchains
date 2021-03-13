@@ -1,9 +1,18 @@
 {
   "name": "@theqrl/hashchains",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "hashchains utilities",
-  "main": "src/index.js",
-  "browser": "dist/hashchains.js",
+  "main": "./src/index.js",
+  "type": "module",
+  "module": "./src/index.js",
+  "exports": {
+    "import": "./src/index.js",
+    "default": "./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theqrl/hashchains"
+  },
   "scripts": {
     "start": "nodemon --exec babel-node ./src/index.js",
     "dev": "npm-run-all --parallel dev:lint dev:test",
@@ -18,6 +27,12 @@
   },
   "author": "JP Lomas <jp@theqrl.org>",
   "license": "MIT",
+  "keywords": [
+    "hashchains",
+    "keccak",
+    "qrl",
+    "enqlave"
+  ],
   "publishConfig": {
     "access": "public"
   },
