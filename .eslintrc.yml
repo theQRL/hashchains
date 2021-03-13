@@ -6,19 +6,13 @@ parserOptions:
   ecmaFeatures:
     jsx: true # enable React's JSX
 
-# register plugins
-plugins:
-  - meteor
-
 # use the rules of eslint-config-airbnb
 # and the recommended rules of eslint-plugin-meteor
 extends:
   - airbnb-base
-  - plugin:meteor/recommended
 
 # registerenvironments
 env:
-  meteor: true
   browser: true
   node: true
   es6: true
@@ -40,10 +34,6 @@ rules:
   import/extensions:
     - off
     - never
-  # import/no-extraneous-dependencies: 0
-  # eslint-plugin-meteor
-  meteor/no-session: [0] # allow Session
-  # meteor/prefer-session-equals: [2] # prefer Session.equals instead
   max-len:
     - error
     - code: 120
@@ -52,17 +42,6 @@ rules:
 
 globals:
   QRLLIB: true
-  LocalStore: true
   ethereum: true
-
-  # packages
-  FlowRouter: false # kadira:flow-router
-  moment: false # momentjs:moment
-  BlazeLayout: false
-  
-settings:
-  import/core-modules: [ meteor ]
-  import/resolver:
-    meteor:
-      extensions:
-        - .js
+  describe: true
+  it: true
