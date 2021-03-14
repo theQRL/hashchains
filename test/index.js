@@ -1,11 +1,21 @@
 /* eslint no-console: 0 */
 
 const { expect } = require('chai')
-const { HashChains, HashChain } = require('../src/index.js')
+const { HashChains, HashChain } = require('../dist/hashchains.cjs.js')
 
 // eslint-disable-next-line
-const mnemonic =
-  'busy field enact street stove sound victory siren alert shadow parent will spend pass rival slender used trigger system shrimp hungry float violin local'
+const mnemonic = 'busy field enact street stove sound victory siren alert shadow parent will spend pass rival slender used trigger system shrimp hungry float violin local'
+
+describe('test esm build', function () {
+  it('classes should throw if called as functions', function () {
+    expect(function () {
+      HashChains(mnemonic, 5, 0, 'sha256')
+    }).to.throw()
+    expect(function () {
+      HashChain(mnemonic, 5, 0, 'sha256')
+    }).to.throw()
+  })
+})
 
 describe('make a hashchain', function () {
   it('2 chains should be created if called without length parameter', function () {
