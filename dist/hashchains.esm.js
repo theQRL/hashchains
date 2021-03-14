@@ -1,4 +1,4 @@
-/* @theqrl/hashchains v0.1.2 - Copyright (C) Die QRL Stiftung. License: MIT */
+/* @theqrl/hashchains v0.1.3 - Copyright (C) Die QRL Stiftung. License: MIT */
 import keccak from 'keccak';
 
 function _classCallCheck(instance, Constructor) {

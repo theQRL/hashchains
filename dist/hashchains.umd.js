@@ -1,9 +1,9 @@
-/* @theqrl/hashchains v0.1.2 - Copyright (C) Die QRL Stiftung. License: MIT */
+/* @theqrl/hashchains v0.1.3 - Copyright (C) Die QRL Stiftung. License: MIT */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('stream'), require('fs'), require('path'), require('os')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'stream', 'fs', 'path', 'os'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.HashChains = {}, global.require$$0, global.fs, global.path, global.os));
-}(this, (function (exports, require$$0, fs, path, os) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('stream'), require('fs'), require('path'), require('os')) :
+  typeof define === 'function' && define.amd ? define(['stream', 'fs', 'path', 'os'], factory) :
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.require$$0, global.fs, global.path, global.os));
+}(this, (function (require$$0, fs, path, os) { 'use strict';
 
   function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -680,9 +680,7 @@
     this.chains = hashChains;
   };
 
-  exports.HashChain = HashChain;
-  exports.HashChains = HashChains;
-
-  Object.defineProperty(exports, '__esModule', { value: true });
+  window.HashChains = HashChains;
+  window.HashChain = HashChain;
 
 })));

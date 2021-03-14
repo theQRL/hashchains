@@ -15,7 +15,7 @@ const babelCommonOptions = {
 
 export default [
   {
-    input: 'src/index.js',
+    input: 'build.js',
     plugins: [
       resolve({
         keccak: true
