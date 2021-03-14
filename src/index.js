@@ -1,8 +1,8 @@
 /* eslint max-classes-per-file: 0 */
 
-import keccak from 'keccak'
+const keccak = require('keccak')
 
-export class HashChain {
+class HashChain {
   constructor(hashRoot, hashFunction, length) {
     this.hashRoot = hashRoot
     this.hashFunction = hashFunction || 'keccak256'
@@ -21,7 +21,7 @@ export class HashChain {
   }
 }
 
-export class HashChains {
+class HashChains {
   constructor(mnemonic, numberToCreate, index, hashFunction, length) {
     this.hashFunction = hashFunction || 'keccak256'
     this.length = parseInt(length, 10) || 64
@@ -49,4 +49,8 @@ export class HashChains {
     }
     this.chains = hashChains
   }
+}
+
+module.exports = {
+  HashChain, HashChains
 }

@@ -1,11 +1,12 @@
-/* @theqrl/hashchains v0.1.3 - Copyright (C) Die QRL Stiftung. License: MIT */
-import keccak from 'keccak';
-
+/* @theqrl/hashchains v0.2.0 - Copyright (C) Die QRL Stiftung. License: MIT */
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
   }
 }
+
+/* eslint max-classes-per-file: 0 */
+var keccak = require('keccak');
 
 var HashChain = function HashChain(hashRoot, hashFunction, length) {
   _classCallCheck(this, HashChain);
@@ -27,6 +28,7 @@ var HashChain = function HashChain(hashRoot, hashFunction, length) {
   this.chain = hc;
   return hc;
 };
+
 var HashChains = function HashChains(mnemonic, numberToCreate, index, hashFunction, length) {
   _classCallCheck(this, HashChains);
 
@@ -55,4 +57,7 @@ var HashChains = function HashChains(mnemonic, numberToCreate, index, hashFuncti
   this.chains = hashChains;
 };
 
-export { HashChain, HashChains };
+module.exports = {
+  HashChain: HashChain,
+  HashChains: HashChains
+};

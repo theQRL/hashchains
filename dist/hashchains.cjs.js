@@ -1,19 +1,14 @@
-/* @theqrl/hashchains v0.1.3 - Copyright (C) Die QRL Stiftung. License: MIT */
+/* @theqrl/hashchains v0.2.0 - Copyright (C) Die QRL Stiftung. License: MIT */
 'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
-var keccak = require('keccak');
-
-function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
-
-var keccak__default = /*#__PURE__*/_interopDefaultLegacy(keccak);
 
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
   }
 }
+
+/* eslint max-classes-per-file: 0 */
+var keccak = require('keccak');
 
 var HashChain = function HashChain(hashRoot, hashFunction, length) {
   _classCallCheck(this, HashChain);
@@ -26,7 +21,7 @@ var HashChain = function HashChain(hashRoot, hashFunction, length) {
 
   for (var i = 0; i < this.length; i += 1) {
     if (this.hashFunction === 'keccak256') {
-      hc.push(keccak__default['default']('keccak256').update("".concat(hc[i])).digest('hex'));
+      hc.push(keccak('keccak256').update("".concat(hc[i])).digest('hex'));
     } else {
       throw new Error('hash function not implemented');
     }
@@ -35,6 +30,7 @@ var HashChain = function HashChain(hashRoot, hashFunction, length) {
   this.chain = hc;
   return hc;
 };
+
 var HashChains = function HashChains(mnemonic, numberToCreate, index, hashFunction, length) {
   _classCallCheck(this, HashChains);
 
@@ -47,7 +43,7 @@ var HashChains = function HashChains(mnemonic, numberToCreate, index, hashFuncti
 
   for (var i = 0; i < chainsToMake; i += 1) {
     if (this.hashFunction === 'keccak256') {
-      hashRoot = keccak__default['default']('keccak256').update("".concat(mnemonic).concat(startingIndex + i)).digest('hex');
+      hashRoot = keccak('keccak256').update("".concat(mnemonic).concat(startingIndex + i)).digest('hex');
     } else {
       throw new Error('hash function not implemented');
     }
@@ -63,5 +59,7 @@ var HashChains = function HashChains(mnemonic, numberToCreate, index, hashFuncti
   this.chains = hashChains;
 };
 
-exports.HashChain = HashChain;
-exports.HashChains = HashChains;
+module.exports = {
+  HashChain: HashChain,
+  HashChains: HashChains
+};

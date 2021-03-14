@@ -1,13 +1,14 @@
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import babel from '@rollup/plugin-babel'
+import nodePolyfills from 'rollup-plugin-node-polyfills'
 import pkg from './package.json'
 
 const copyright = 'Copyright (C) Die QRL Stiftung. License: MIT'
 const banner = `/* @theqrl/hashchains v${pkg.version} - ${copyright} */`
 
 const babelCommonOptions = {
-  exclude: ['node_modules/**'],
+  babelHelpers: 'bundled',
   plugins: ['@babel/plugin-proposal-class-properties', '@babel/plugin-proposal-object-rest-spread'],
 }
 
@@ -15,16 +16,16 @@ const babelCommonOptions = {
 
 export default [
   {
-    input: 'build.js',
+    input: 'src/index.js',
     plugins: [
-      resolve({
-        keccak: true
-      }),
+      resolve(),
+      nodePolyfills(),
+      commonjs(),
       babel({
         ...babelCommonOptions,
         presets: [
           [
-            '@babel/preset-env',
+            '@babel/env',
             {
               targets: {
                 browsers: ['ie >= 8'],
@@ -34,11 +35,11 @@ export default [
           ],
         ],
       }),
-      commonjs({
-        include: 'node_modules/**'
-      }),
     ].filter(Boolean),
     output: {
+      globals: {
+        stream: 'stream',
+      },
       banner,
       name: 'HashChains',
       file: pkg.browser,

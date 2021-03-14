@@ -1,6 +1,6 @@
 {
   "name": "@theqrl/hashchains",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "hashchains utilities",
   "main": "./dist/hashchains.cjs.js",
   "module": "./dist/hashchains.esm.js",
@@ -15,7 +15,7 @@
     "dev:lint": "nodemon --ignore tests/ -x eslint .",
     "dev:test": "nodemon --ignore tests/ -x npm run test",
     "clean": "rm -rf dist && mkdir dist",
-    "build": "rollup -c",
+    "build": "rollup -c && browserify -p esmify build.js -o dist/hashchains-browser.js",
     "serve": "cd demo-vue && npm run serve",
     "lint": "eslint .",
     "preversion": "npm test && npm run lint",
@@ -57,10 +57,10 @@
   ],
   "devDependencies": {
     "@babel/cli": "^7.1.2",
-    "@babel/core": "^7.1.2",
+    "@babel/core": "^7.13.10",
     "@babel/node": "^7.0.0",
     "@babel/plugin-transform-async-to-generator": "^7.10.4",
-    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-env": "^7.13.10",
     "@babel/register": "^7.0.0",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^17.0.0",
@@ -68,6 +68,7 @@
     "@vue/cli": "^4.5.11",
     "babel-eslint": "^10.1.0",
     "babel-plugin-istanbul": "^6.0.0",
+    "browserify": "^17.0.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.0.0",
@@ -76,13 +77,15 @@
     "eslint-config-import": "^0.13.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-modules": "^1.1.1",
+    "esmify": "^2.1.1",
     "istanbul": "^0.4.5",
     "mocha": "^8.1.3",
     "mocha-lcov-reporter": "^1.3.0",
     "nodemon": "^1.18.4",
     "npm-run-all": "^4.1.5",
     "nyc": "^15.1.0",
-    "rollup": "^2.41.2"
+    "rollup": "^2.41.2",
+    "rollup-plugin-node-polyfills": "^0.2.1"
   },
   "dependencies": {
     "keccak": "^3.0.1"

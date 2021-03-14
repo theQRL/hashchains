@@ -1,7 +1,7 @@
 /* eslint no-console: 0 */
 
 const { expect } = require('chai')
-const { HashChains, HashChain } = require('../dist/hashchains.cjs.js')
+const { HashChains, HashChain } = require('../src/index.js')
 
 // eslint-disable-next-line
 const mnemonic = 'busy field enact street stove sound victory siren alert shadow parent will spend pass rival slender used trigger system shrimp hungry float violin local'
