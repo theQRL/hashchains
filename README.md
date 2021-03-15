@@ -1,6 +1,7 @@
 # @theqrl/hashchains
 
-[![Coverage Status](https://coveralls.io/repos/github/theQRL/hashchains/badge.svg?branch=main)](https://coveralls.io/github/theQRL/hashchains?branch=main) [![Build Status](https://www.travis-ci.com/theQRL/hashchains.svg?branch=main)](https://www.travis-ci.com/theQRL/hashchains) ![npm (scoped)](https://img.shields.io/npm/v/@theqrl/hashchains) ![NPM](https://img.shields.io/npm/l/@theqrl/hashchains)
+[![Coverage Status](https://coveralls.io/repos/github/theQRL/hashchains/badge.svg?branch=main)](https://coveralls.io/github/theQRL/hashchains?branch=main) [![Build Status](https://www.travis-ci.com/theQRL/hashchains.svg?branch=main)](https://www.travis-ci.com/theQRL/hashchains) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ad5f3b6ad4124518be69351feb4a8957)](https://www.codacy.com/gh/theQRL/hashchains/dashboard?utm_source=github.com&utm_medium=referral&utm_content=theQRL/hashchains&utm_campaign=Badge_Grade)
+ ![npm (scoped)](https://img.shields.io/npm/v/@theqrl/hashchains) ![NPM](https://img.shields.io/npm/l/@theqrl/hashchains)
 
 There's a [live demo on Codepen](https://codepen.io/jplomas/live/187d9ff57e404c38a76373e39b796eb4) to show the package in use.
 
