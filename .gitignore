@@ -1,3 +1,4 @@
 node_modules
 /dist/tests/.nyc-temp
 /dist/tests/nyc
+/dist/tests/coverage

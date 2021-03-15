@@ -23,7 +23,7 @@
     "postversion": "git push && git push --tags && npm publish",
     "test": "nyc ./node_modules/.bin/mocha --timeout 30000 --require @babel/register",
     "debug": "node --inspect-brk ./src/index.js",
-    "cover": "nyc --reporter=text ./node_modules/mocha/bin/_mocha test/*.js --timeout 10000 && nyc --reporter=text-lcov ./node_modules/mocha/bin/_mocha --timeout 10000 test/*.js > ./dist/tests/coverage/lcov.info"
+    "cover": "nyc --reporter=text-lcov ./node_modules/mocha/bin/_mocha --timeout 10000 test/*.js | coveralls"
   },
   "author": "JP Lomas <jp@theqrl.org>",
   "license": "MIT",
