@@ -51,6 +51,20 @@ class HashChains {
   }
 }
 
+function verifyChain(hashRoot, hashReveal, length, algorithm) {
+  const iterations = length || 64
+  const hashFunction = algorithm || 'keccak256'
+  let hash = hashRoot
+  if (hashFunction === 'keccak256') {
+    for (let i = 0; i < iterations; i += 1) {
+      hash = keccak('keccak256').update(hash).digest('hex')
+    }
+  } else {
+    throw new Error('hash function not implemented')
+  }
+  return (hash === hashReveal)
+}
+
 module.exports = {
-  HashChain, HashChains
+  HashChain, HashChains, verifyChain
 }

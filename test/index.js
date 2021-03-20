@@ -1,7 +1,7 @@
 /* eslint no-console: 0 */
 
 const { expect } = require('chai')
-const { HashChains, HashChain } = require('../src/index.js')
+const { HashChains, HashChain, verifyChain } = require('../src/index.js')
 
 // eslint-disable-next-line
 const mnemonic = 'busy field enact street stove sound victory siren alert shadow parent will spend pass rival slender used trigger system shrimp hungry float violin local'
@@ -40,6 +40,10 @@ describe('make a hashchain', function () {
     expect(hc.chains[0].hashReveal).to.equal('22a4c39faafd3d54f69b458a5bea0ab679b9d7dfcd4ba9a12ec4818fe0d926ba')
     expect(hc.chains[0].hashchain[64]).to.equal('22a4c39faafd3d54f69b458a5bea0ab679b9d7dfcd4ba9a12ec4818fe0d926ba')
   })
+  it('from test mnemonic correctly report hashReveal', function () {
+    const hc = new HashChains(mnemonic)
+    expect(hc.chains[0].hashReveal).to.equal('22a4c39faafd3d54f69b458a5bea0ab679b9d7dfcd4ba9a12ec4818fe0d926ba')
+  })
   it('expect overlapping chains to have same data', function () {
     const hc = new HashChains(mnemonic, 5)
     const hc2 = new HashChains(mnemonic, 5, 4)
@@ -51,6 +55,24 @@ describe('make a hashchain', function () {
     }).to.throw()
     expect(function () {
       const hc = new HashChain(mnemonic, 5, 0, 'sha256') // eslint-disable-line
+    }).to.throw()
+  })
+})
+
+describe('verify a hashchain', function () {
+  it('valid chain should correctly verify', function () {
+    const hc = new HashChains(mnemonic)
+    expect(verifyChain(hc.chains[0].hashRoot, hc.chains[0].hashReveal)).to.equal(true)
+    expect(verifyChain(hc.chains[0].hashRoot, hc.chains[0].hashReveal, 65)).to.equal(false)
+  })
+  it('valid chain will not verify with invalid length', function () {
+    const hc = new HashChains(mnemonic)
+    expect(verifyChain(hc.chains[0].hashRoot, hc.chains[0].hashReveal, 65)).to.equal(false)
+  })
+  it('expect verify to throw if an invalid hashing algorithm is passed', function () {
+    const hc = new HashChains(mnemonic)
+    expect(function () {
+      const verify = verifyChain(hc.chains[0].hashRoot, hc.chains[0].hashReveal, 65, 'sha256') // eslint-disable-line
     }).to.throw()
   })
 })
