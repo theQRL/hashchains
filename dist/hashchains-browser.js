@@ -1,8 +1,9 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
-const { HashChains, HashChain } = require('./src/index.js')
+const { HashChains, HashChain, verifyChain } = require('./src/index.js')
 
 window.HashChains = HashChains
 window.HashChain = HashChain
+window.verifyChain = verifyChain
 
 },{"./src/index.js":33}],2:[function(require,module,exports){
 'use strict'
@@ -6910,8 +6911,22 @@ class HashChains {
   }
 }
 
+function verifyChain(hashRoot, hashReveal, length, algorithm) {
+  const iterations = length || 64
+  const hashFunction = algorithm || 'keccak256'
+  let hash = hashRoot
+  if (hashFunction === 'keccak256') {
+    for (let i = 0; i < iterations; i += 1) {
+      hash = keccak('keccak256').update(hash).digest('hex')
+    }
+  } else {
+    throw new Error('hash function not implemented')
+  }
+  return (hash === hashReveal)
+}
+
 module.exports = {
-  HashChain, HashChains
+  HashChain, HashChains, verifyChain
 }
 
 },{"keccak":8}]},{},[1]);

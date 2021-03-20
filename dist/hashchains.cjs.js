@@ -1,4 +1,4 @@
-/* @theqrl/hashchains v0.2.0 - Copyright (C) Die QRL Stiftung. License: MIT */
+/* @theqrl/hashchains v0.3.1 - Copyright (C) Die QRL Stiftung. License: MIT */
 'use strict';
 
 function _classCallCheck(instance, Constructor) {
@@ -59,7 +59,24 @@ var HashChains = function HashChains(mnemonic, numberToCreate, index, hashFuncti
   this.chains = hashChains;
 };
 
+function verifyChain(hashRoot, hashReveal, length, algorithm) {
+  var iterations = length || 64;
+  var hashFunction = algorithm || 'keccak256';
+  var hash = hashRoot;
+
+  if (hashFunction === 'keccak256') {
+    for (var i = 0; i < iterations; i += 1) {
+      hash = keccak('keccak256').update(hash).digest('hex');
+    }
+  } else {
+    throw new Error('hash function not implemented');
+  }
+
+  return hash === hashReveal;
+}
+
 module.exports = {
   HashChain: HashChain,
-  HashChains: HashChains
+  HashChains: HashChains,
+  verifyChain: verifyChain
 };
