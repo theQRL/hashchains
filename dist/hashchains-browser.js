@@ -4,6 +4,7 @@ const {
   HashChains,
   HashChain,
   verifyChain,
+  validateMnemonic,
   mnemonicToHexstring
 } = require('./src/index.js')
 
@@ -11,6 +12,7 @@ window.HashChains = HashChains
 window.HashChain = HashChain
 window.verifyChain = verifyChain
 window.mnemonicToHexstring = mnemonicToHexstring
+window.validateMnemonic = validateMnemonic
 window.Buffer = Buffer
 
 },{"./src/index.js":82,"buffer/":16}],2:[function(require,module,exports){

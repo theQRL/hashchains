@@ -1,4 +1,4 @@
-/* @theqrl/hashchains v0.4.0 - Copyright (C) Die QRL Stiftung. License: MIT */
+/* @theqrl/hashchains v0.4.1 - Copyright (C) Die QRL Stiftung. License: MIT */
 'use strict';
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {

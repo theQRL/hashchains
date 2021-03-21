@@ -1,4 +1,4 @@
-/* @theqrl/hashchains v0.4.0 - Copyright (C) Die QRL Stiftung. License: MIT */
+/* @theqrl/hashchains v0.4.1 - Copyright (C) Die QRL Stiftung. License: MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('buffer')) :
   typeof define === 'function' && define.amd ? define(['buffer'], factory) :

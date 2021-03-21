@@ -1,6 +1,6 @@
 {
   "name": "@theqrl/hashchains",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "hashchains utilities",
   "main": "./dist/hashchains.cjs.js",
   "module": "./dist/hashchains.esm.js",
