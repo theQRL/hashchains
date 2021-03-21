@@ -1,4 +1,4 @@
-/* @theqrl/hashchains v0.4.1 - Copyright (C) Die QRL Stiftung. License: MIT */
+/* @theqrl/hashchains v0.4.2 - Copyright (C) Die QRL Stiftung. License: MIT */
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
     var info = gen[key](arg);
