@@ -1,9 +1,45 @@
-/* @theqrl/hashchains v0.3.1 - Copyright (C) Die QRL Stiftung. License: MIT */
+/* @theqrl/hashchains v0.4.0 - Copyright (C) Die QRL Stiftung. License: MIT */
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('buffer')) :
   typeof define === 'function' && define.amd ? define(['buffer'], factory) :
   (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.HashChains = factory(global.buffer));
 }(this, (function (buffer) { 'use strict';
+
+  function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+    try {
+      var info = gen[key](arg);
+      var value = info.value;
+    } catch (error) {
+      reject(error);
+      return;
+    }
+
+    if (info.done) {
+      resolve(value);
+    } else {
+      Promise.resolve(value).then(_next, _throw);
+    }
+  }
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var self = this,
+          args = arguments;
+      return new Promise(function (resolve, reject) {
+        var gen = fn.apply(self, args);
+
+        function _next(value) {
+          asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+        }
+
+        function _throw(err) {
+          asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+        }
+
+        _next(undefined);
+      });
+    };
+  }
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -478,6 +514,248 @@
     }
   });
 
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var createHash = require("create-hash");
+
+  var pbkdf2_1 = require("pbkdf2");
+
+  var randomBytes = require("randombytes");
+
+  var _wordlists_1 = require("./_wordlists");
+
+  var DEFAULT_WORDLIST = _wordlists_1._default;
+  var INVALID_MNEMONIC = 'Invalid mnemonic';
+  var INVALID_ENTROPY = 'Invalid entropy';
+  var INVALID_CHECKSUM = 'Invalid mnemonic checksum';
+  var WORDLIST_REQUIRED = 'A wordlist is required but a default could not be found.\n' + 'Please explicitly pass a 2048 word array explicitly.';
+
+  function pbkdf2Promise(password, saltMixin, iterations, keylen, digest) {
+    return Promise.resolve().then(function () {
+      return new Promise(function (resolve, reject) {
+        var callback = function callback(err, derivedKey) {
+          if (err) {
+            return reject(err);
+          } else {
+            return resolve(derivedKey);
+          }
+        };
+
+        pbkdf2_1.pbkdf2(password, saltMixin, iterations, keylen, digest, callback);
+      });
+    });
+  }
+
+  function normalize(str) {
+    return (str || '').normalize('NFKD');
+  }
+
+  function lpad(str, padString, length) {
+    while (str.length < length) {
+      str = padString + str;
+    }
+
+    return str;
+  }
+
+  function binaryToByte(bin) {
+    return parseInt(bin, 2);
+  }
+
+  function bytesToBinary(bytes) {
+    return bytes.map(function (x) {
+      return lpad(x.toString(2), '0', 8);
+    }).join('');
+  }
+
+  function deriveChecksumBits(entropyBuffer) {
+    var ENT = entropyBuffer.length * 8;
+    var CS = ENT / 32;
+    var hash = createHash('sha256').update(entropyBuffer).digest();
+    return bytesToBinary(Array.from(hash)).slice(0, CS);
+  }
+
+  function salt(password) {
+    return 'mnemonic' + (password || '');
+  }
+
+  function mnemonicToSeedSync(mnemonic, password) {
+    var mnemonicBuffer = buffer.Buffer.from(normalize(mnemonic), 'utf8');
+    var saltBuffer = buffer.Buffer.from(salt(normalize(password)), 'utf8');
+    return pbkdf2_1.pbkdf2Sync(mnemonicBuffer, saltBuffer, 2048, 64, 'sha512');
+  }
+
+  exports.mnemonicToSeedSync = mnemonicToSeedSync;
+
+  function mnemonicToSeed(mnemonic, password) {
+    return Promise.resolve().then(function () {
+      var mnemonicBuffer = buffer.Buffer.from(normalize(mnemonic), 'utf8');
+      var saltBuffer = buffer.Buffer.from(salt(normalize(password)), 'utf8');
+      return pbkdf2Promise(mnemonicBuffer, saltBuffer, 2048, 64, 'sha512');
+    });
+  }
+
+  exports.mnemonicToSeed = mnemonicToSeed;
+
+  function mnemonicToEntropy(mnemonic, wordlist) {
+    wordlist = wordlist || DEFAULT_WORDLIST;
+
+    if (!wordlist) {
+      throw new Error(WORDLIST_REQUIRED);
+    }
+
+    var words = normalize(mnemonic).split(' ');
+
+    if (words.length % 3 !== 0) {
+      throw new Error(INVALID_MNEMONIC);
+    } // convert word indices to 11 bit binary strings
+
+
+    var bits = words.map(function (word) {
+      var index = wordlist.indexOf(word);
+
+      if (index === -1) {
+        throw new Error(INVALID_MNEMONIC);
+      }
+
+      return lpad(index.toString(2), '0', 11);
+    }).join(''); // split the binary string into ENT/CS
+
+    var dividerIndex = Math.floor(bits.length / 33) * 32;
+    var entropyBits = bits.slice(0, dividerIndex);
+    var checksumBits = bits.slice(dividerIndex); // calculate the checksum and compare
+
+    var entropyBytes = entropyBits.match(/(.{1,8})/g).map(binaryToByte);
+
+    if (entropyBytes.length < 16) {
+      throw new Error(INVALID_ENTROPY);
+    }
+
+    if (entropyBytes.length > 32) {
+      throw new Error(INVALID_ENTROPY);
+    }
+
+    if (entropyBytes.length % 4 !== 0) {
+      throw new Error(INVALID_ENTROPY);
+    }
+
+    var entropy = buffer.Buffer.from(entropyBytes);
+    var newChecksum = deriveChecksumBits(entropy);
+
+    if (newChecksum !== checksumBits) {
+      throw new Error(INVALID_CHECKSUM);
+    }
+
+    return entropy.toString('hex');
+  }
+
+  exports.mnemonicToEntropy = mnemonicToEntropy;
+
+  function entropyToMnemonic(entropy, wordlist) {
+    if (!buffer.Buffer.isBuffer(entropy)) {
+      entropy = buffer.Buffer.from(entropy, 'hex');
+    }
+
+    wordlist = wordlist || DEFAULT_WORDLIST;
+
+    if (!wordlist) {
+      throw new Error(WORDLIST_REQUIRED);
+    } // 128 <= ENT <= 256
+
+
+    if (entropy.length < 16) {
+      throw new TypeError(INVALID_ENTROPY);
+    }
+
+    if (entropy.length > 32) {
+      throw new TypeError(INVALID_ENTROPY);
+    }
+
+    if (entropy.length % 4 !== 0) {
+      throw new TypeError(INVALID_ENTROPY);
+    }
+
+    var entropyBits = bytesToBinary(Array.from(entropy));
+    var checksumBits = deriveChecksumBits(entropy);
+    var bits = entropyBits + checksumBits;
+    var chunks = bits.match(/(.{1,11})/g);
+    var words = chunks.map(function (binary) {
+      var index = binaryToByte(binary);
+      return wordlist[index];
+    });
+    return wordlist[0] === "\u3042\u3044\u3053\u304F\u3057\u3093" // Japanese wordlist
+    ? words.join("\u3000") : words.join(' ');
+  }
+
+  exports.entropyToMnemonic = entropyToMnemonic;
+
+  function generateMnemonic(strength, rng, wordlist) {
+    strength = strength || 128;
+
+    if (strength % 32 !== 0) {
+      throw new TypeError(INVALID_ENTROPY);
+    }
+
+    rng = rng || randomBytes;
+    return entropyToMnemonic(rng(strength / 8), wordlist);
+  }
+
+  exports.generateMnemonic = generateMnemonic;
+
+  function validateMnemonic$1(mnemonic, wordlist) {
+    try {
+      mnemonicToEntropy(mnemonic, wordlist);
+    } catch (e) {
+      return false;
+    }
+
+    return true;
+  }
+
+  exports.validateMnemonic = validateMnemonic$1;
+
+  function setDefaultWordlist(language) {
+    var result = _wordlists_1.wordlists[language];
+
+    if (result) {
+      DEFAULT_WORDLIST = result;
+    } else {
+      throw new Error('Could not find wordlist for language "' + language + '"');
+    }
+  }
+
+  exports.setDefaultWordlist = setDefaultWordlist;
+
+  function getDefaultWordlist() {
+    if (!DEFAULT_WORDLIST) {
+      throw new Error('No Default Wordlist set');
+    }
+
+    return Object.keys(_wordlists_1.wordlists).filter(function (lang) {
+      if (lang === 'JA' || lang === 'EN') {
+        return false;
+      }
+
+      return _wordlists_1.wordlists[lang].every(function (word, index) {
+        return word === DEFAULT_WORDLIST[index];
+      });
+    })[0];
+  }
+
+  exports.getDefaultWordlist = getDefaultWordlist;
+
+  var _wordlists_2 = require("./_wordlists");
+
+  exports.wordlists = _wordlists_2.wordlists;
+
+  var src$1 = /*#__PURE__*/Object.freeze({
+    __proto__: null
+  });
+
+  var bip39 = /*@__PURE__*/getAugmentedNamespace(src$1);
+
   var HashChain = function HashChain(hashRoot, hashFunction, length) {
     _classCallCheck(this, HashChain);
 
@@ -489,7 +767,8 @@
 
     for (var i = 0; i < this.length; i += 1) {
       if (this.hashFunction === 'keccak256') {
-        hc.push(keccak('keccak256').update("".concat(hc[i])).digest('hex'));
+        var buf = Buffer.from(hc[i], 'hex');
+        hc.push(keccak('keccak256').update(buf).digest('hex'));
       } else {
         throw new Error('hash function not implemented');
       }
@@ -499,32 +778,34 @@
     return hc;
   };
 
-  var HashChains = function HashChains(mnemonic, numberToCreate, index, hashFunction, length) {
+  var HashChains = function HashChains(seed, numberToCreate, index, hashFunction, length) {
     _classCallCheck(this, HashChains);
 
     this.hashFunction = hashFunction || 'keccak256';
     this.length = parseInt(length, 10) || 64;
     var startingIndex = parseInt(index, 10) || 0;
     var chainsToMake = parseInt(numberToCreate, 10) || 2;
+    var seedBuf = Buffer.from(seed, 'hex');
     var hashChains = [];
     var hashRoot = null;
 
-    for (var i = 0; i < chainsToMake; i += 1) {
-      if (this.hashFunction === 'keccak256') {
-        hashRoot = keccak('keccak256').update("".concat(mnemonic).concat(startingIndex + i)).digest('hex');
-      } else {
-        throw new Error('hash function not implemented');
+    if (this.hashFunction === 'keccak256') {
+      for (var i = 0; i < chainsToMake; i += 1) {
+        var iBuf = Buffer.from("".concat(startingIndex + i));
+        hashRoot = keccak('keccak256').update(Buffer.concat([seedBuf, iBuf])).digest('hex');
+        var hc = new HashChain(hashRoot);
+        hashChains.push({
+          index: startingIndex + i,
+          hashRoot: hashRoot,
+          hashReveal: hc[64],
+          hashchain: hc
+        });
       }
-      var hc = new HashChain(hashRoot);
-      hashChains.push({
-        index: startingIndex + i,
-        hashRoot: hashRoot,
-        hashReveal: hc[64],
-        hashchain: hc
-      });
-    }
 
-    this.chains = hashChains;
+      this.chains = hashChains;
+    } else {
+      throw new Error('hash function not implemented');
+    }
   };
 
   function verifyChain(hashRoot, hashReveal, length, algorithm) {
@@ -534,7 +815,7 @@
 
     if (hashFunction === 'keccak256') {
       for (var i = 0; i < iterations; i += 1) {
-        hash = keccak('keccak256').update(hash).digest('hex');
+        hash = keccak('keccak256').update(Buffer.from(hash, 'hex')).digest('hex');
       }
     } else {
       throw new Error('hash function not implemented');
@@ -543,10 +824,43 @@
     return hash === hashReveal;
   }
 
+  function mnemonicToHexstringSync(mnemonic) {
+    return bip39.mnemonicToSeedSync(mnemonic).toString('hex');
+  }
+
+  function mnemonicToHexstring(_x) {
+    return _mnemonicToHexstring.apply(this, arguments);
+  }
+
+  function _mnemonicToHexstring() {
+    _mnemonicToHexstring = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(mnemonic) {
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              return _context.abrupt("return", bip39.mnemonicToSeed(mnemonic).toString('hex'));
+
+            case 1:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    }));
+    return _mnemonicToHexstring.apply(this, arguments);
+  }
+
+  function validateMnemonic(mnemonic) {
+    return bip39.validateMnemonic(mnemonic);
+  }
+
   var src = {
     HashChain: HashChain,
     HashChains: HashChains,
-    verifyChain: verifyChain
+    verifyChain: verifyChain,
+    mnemonicToHexstring: mnemonicToHexstring,
+    mnemonicToHexstringSync: mnemonicToHexstringSync,
+    validateMnemonic: validateMnemonic
   };
 
   return src;

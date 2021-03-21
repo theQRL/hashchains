@@ -4,57 +4,88 @@
     <h2>Verify</h2>
     <form>
       <label>HashRoot</label>
-      <input name="root" v-model="root" style="width: 100%" v-change="verify()" />
+      <input name="root" v-model="root" style="width: 100%" @input="verify()" />
       <label>HashReveal / ChainTerminator</label>
-      <input name="reveal" v-model="reveal" style="width: 100%" v-change="verify()" />
+      <input name="reveal" v-model="reveal" style="width: 100%" @input="verify()" />
     </form>
     <div style="margin-top: 10px;"><span class="validity" v-bind:class="{valid: valid, invalid: !valid}">{{ result() }}</span></div>
     <div style="height: 40px;"></div>
     <hr />
     <h2>Create</h2>
     <form>
-      <label>Mnemonic phrase/hexseed</label>
-      <input name="mnemonic" v-model="seed" style="width: 100%" />
+      <label>BIP39 mnemonic phrase</label>
+      <input name="mnemonic" v-model="seed" style="width: 100%" @input="create()" />
+      <label>BIP39 hexstring</label>
+      <input name="mnemonic" v-model="bip39hex" style="width: 100%" disabled />
       <label>Index</label>
-      <input type="number" name="index" v-model="index" v-change="create()" />
+      <input type="number" name="index" v-model="index" @input="create()" />
       <label>HashFunction</label>
       <select name="hash">
         <option value="keccak256">keccak256</option>
       </select>
     </form>
 
-<!--     <button @click="create">Create HashChain</button> -->
+  <div v-if="this.validMnemonic">
     <h2>HashChain</h2>
+    <h3>
+      <code>root: {{ this.chains[0].hashRoot }}</code>
+      <code>reveal: {{ this.chains[0].hashReveal }}</code>
+    </h3>
+
     <code>
       <div v-for="(hex, index) in chains[0].hashchain" v-bind:key="index">
         {{index}}: {{hex}}
       </div>
     </code>
   </div>
+  <div v-if="!this.validMnemonic" style="margin-top: 10px;">
+    <span class="validity invalid">INVALID BIP39 MNEMONIC</span>
+  </div>
+  </div>
 </template>
 
 <script>
-import { HashChains, verifyChain } from './../../src/index'
+import { HashChains, verifyChain, mnemonicToHexstringSync, validateMnemonic } from './../../src/index'
 
 export default {
   data() {
     return {
-      seed: "pen icon first one zulu apple",
-      root: "efafeb825f31eab5b524e720a191a2796dbe50f70b477100679a1edab8767c73",
-      reveal: "78c2405dcee53aa076b6ad0b3570a4afbc0603e583251e62b0ada4725ef426a1",
+      seed: "essay shadow creek eager legal just bench exchange miracle work grace vivid load shed genre angry success guide film spray hotel digital barrel grab",
+      root: "42bc241ba4045c96f6b71f999b3373942f2e7c031a7c11a3cbefb10d09971961",
+      reveal: "10373abc181dd10a4cf8e39703616f3c0187f26ccf64cb46eb060a8b0ac92f3f",
       index: 0,
+      bip39hex: '0000',
       valid: false,
-      chains: [{}]
+      chains: [{}],
+      validMnemonic: true,
     };
+  },
+  created() {
+    this.verify()
+    this.create()
   },
   methods: {
     create() {
-      const hcs = new HashChains(this.seed, 1, this.index);
-      console.log(hcs);
-      this.chains = hcs.chains
+      if (validateMnemonic(this.seed)) {
+        const hex = mnemonicToHexstringSync(this.seed)
+        this.bip39hex = hex
+        const hcs = new HashChains(hex, 1, this.index);
+        console.log(hcs);
+        this.chains = hcs.chains
+        this.validMnemonic = true
+      } else {
+        this.chains = [{}]
+        this.validMnemonic = false
+        this.bip39hex = 'enter a valid bip39 mnemonic phrase'
+      }
     },
     verify() {
-      this.valid = verifyChain(this.root, this.reveal)
+      // only verify if valid hexstring
+      if (this.root.length % 2 === 0 && this.reveal.length % 2 === 0) {
+        this.valid = verifyChain(this.root, this.reveal)
+      } else {
+        this.valid = false
+      }
     },
     result() {
       return this.valid ? 'VALID' : 'INVALID'

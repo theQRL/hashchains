@@ -1,7 +1,14 @@
-/* eslint no-console: 0 */
+/* eslint no-console: 0, max-len: 0 */
 
+const chai = require('chai')
+const chaiAsPromised = require('chai-as-promised')
+
+chai.use(chaiAsPromised)
 const { expect } = require('chai')
-const { HashChains, HashChain, verifyChain } = require('../src/index.js')
+
+const {
+  HashChains, HashChain, verifyChain, validateMnemonic, mnemonicToHexstringSync, mnemonicToHexstring
+} = require('../src/index.js')
 
 // eslint-disable-next-line
 const mnemonic = 'busy field enact street stove sound victory siren alert shadow parent will spend pass rival slender used trigger system shrimp hungry float violin local'
@@ -32,17 +39,17 @@ describe('make a hashchain', function () {
   })
   it('from test mnemonic first hashchain should have a hashroot of 23bc...86a6', function () {
     const hc = new HashChains(mnemonic)
-    expect(hc.chains[0].hashRoot).to.equal('23bc761a62c2d555691292fb8e5f315cfab56ce8fc49b79543cafd39b15486a6')
-    expect(hc.chains[0].hashchain[0]).to.equal('23bc761a62c2d555691292fb8e5f315cfab56ce8fc49b79543cafd39b15486a6')
+    expect(hc.chains[0].hashRoot).to.equal('044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d')
+    expect(hc.chains[0].hashchain[0]).to.equal('044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d')
   })
   it('from test mnemonic last hashchain should have a hashreveal of 22a4...26ba', function () {
     const hc = new HashChains(mnemonic)
-    expect(hc.chains[0].hashReveal).to.equal('22a4c39faafd3d54f69b458a5bea0ab679b9d7dfcd4ba9a12ec4818fe0d926ba')
-    expect(hc.chains[0].hashchain[64]).to.equal('22a4c39faafd3d54f69b458a5bea0ab679b9d7dfcd4ba9a12ec4818fe0d926ba')
+    expect(hc.chains[0].hashReveal).to.equal('0bb58fdc4f70ecbe0fcbe0bd1a17a8878ceacb759db13501c1abc9d0838cd204')
+    expect(hc.chains[0].hashchain[64]).to.equal('0bb58fdc4f70ecbe0fcbe0bd1a17a8878ceacb759db13501c1abc9d0838cd204')
   })
   it('from test mnemonic correctly report hashReveal', function () {
     const hc = new HashChains(mnemonic)
-    expect(hc.chains[0].hashReveal).to.equal('22a4c39faafd3d54f69b458a5bea0ab679b9d7dfcd4ba9a12ec4818fe0d926ba')
+    expect(hc.chains[0].hashReveal).to.equal('0bb58fdc4f70ecbe0fcbe0bd1a17a8878ceacb759db13501c1abc9d0838cd204')
   })
   it('expect overlapping chains to have same data', function () {
     const hc = new HashChains(mnemonic, 5)
@@ -63,7 +70,6 @@ describe('verify a hashchain', function () {
   it('valid chain should correctly verify', function () {
     const hc = new HashChains(mnemonic)
     expect(verifyChain(hc.chains[0].hashRoot, hc.chains[0].hashReveal)).to.equal(true)
-    expect(verifyChain(hc.chains[0].hashRoot, hc.chains[0].hashReveal, 65)).to.equal(false)
   })
   it('valid chain will not verify with invalid length', function () {
     const hc = new HashChains(mnemonic)
@@ -74,5 +80,36 @@ describe('verify a hashchain', function () {
     expect(function () {
       const verify = verifyChain(hc.chains[0].hashRoot, hc.chains[0].hashReveal, 65, 'sha256') // eslint-disable-line
     }).to.throw()
+  })
+})
+
+describe('utility functions', function () {
+  it('validate correct bip39 mnemonic', function () {
+    // eslint-disable-next-line
+    const v = validateMnemonic(
+      'essay shadow creek eager legal just bench exchange miracle work grace vivid load shed genre angry success guide film spray hotel digital barrel grab'
+    )
+    expect(v).to.equal(true)
+  })
+  it('invalidate incorrect bip39 mnemonic', function () {
+    // eslint-disable-next-line
+    const v = validateMnemonic('remember Joan Clarke and what she achieved')
+    expect(v).to.equal(false)
+  })
+  it('make a mnemonic from hexstring', function () {
+    const h = mnemonicToHexstringSync(
+      'essay shadow creek eager legal just bench exchange miracle work grace vivid load shed genre angry success guide film spray hotel digital barrel grab'
+    )
+    expect(h).to.equal(
+      '35e92a891583c6b5b7925d9f4084ae8ec9e5591ce7dc84e3631368bacf0b4d262aecc3c89fe89b4480eb6120e8721774efdd81e7f2003416358146add3e243c2'
+    )
+  })
+  it('make a mnemonic from hexstring', async function () {
+    const h = mnemonicToHexstring(
+      'essay shadow creek eager legal just bench exchange miracle work grace vivid load shed genre angry success guide film spray hotel digital barrel grab'
+    )
+    expect(h).to.eventually.equal(
+      '35e92a891583c6b5b7925d9f4084ae8ec9e5591ce7dc84e3631368bacf0b4d262aecc3c89fe89b4480eb6120e8721774efdd81e7f2003416358146add3e243c2'
+    )
   })
 })

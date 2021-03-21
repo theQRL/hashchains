@@ -1,6 +1,7 @@
 /* eslint max-classes-per-file: 0 */
 
 const keccak = require('keccak')
+const bip39 = require('bip39')
 
 class HashChain {
   constructor(hashRoot, hashFunction, length) {
@@ -11,7 +12,8 @@ class HashChain {
     hc.push(this.hashRoot)
     for (let i = 0; i < this.length; i += 1) {
       if (this.hashFunction === 'keccak256') {
-        hc.push(keccak('keccak256').update(`${hc[i]}`).digest('hex'))
+        const buf = Buffer.from(hc[i], 'hex')
+        hc.push(keccak('keccak256').update(buf).digest('hex'))
       } else {
         throw new Error('hash function not implemented')
       }
@@ -22,32 +24,34 @@ class HashChain {
 }
 
 class HashChains {
-  constructor(mnemonic, numberToCreate, index, hashFunction, length) {
+  constructor(seed, numberToCreate, index, hashFunction, length) {
     this.hashFunction = hashFunction || 'keccak256'
     this.length = parseInt(length, 10) || 64
     const startingIndex = parseInt(index, 10) || 0
     const chainsToMake = parseInt(numberToCreate, 10) || 2
+    const seedBuf = Buffer.from(seed, 'hex')
     const hashChains = []
     const hashChainRoots = []
     let hashRoot = null
-    for (let i = 0; i < chainsToMake; i += 1) {
-      if (this.hashFunction === 'keccak256') {
+    if (this.hashFunction === 'keccak256') {
+      for (let i = 0; i < chainsToMake; i += 1) {
+        const iBuf = Buffer.from(`${startingIndex + i}`)
         hashRoot = keccak('keccak256')
-          .update(`${mnemonic}${startingIndex + i}`)
+          .update(Buffer.concat([seedBuf, iBuf]))
           .digest('hex')
-      } else {
-        throw new Error('hash function not implemented')
+        hashChainRoots.push(hashRoot)
+        const hc = new HashChain(hashRoot)
+        hashChains.push({
+          index: startingIndex + i,
+          hashRoot,
+          hashReveal: hc[64],
+          hashchain: hc,
+        })
       }
-      hashChainRoots.push(hashRoot)
-      const hc = new HashChain(hashRoot)
-      hashChains.push({
-        index: startingIndex + i,
-        hashRoot,
-        hashReveal: hc[64],
-        hashchain: hc,
-      })
+      this.chains = hashChains
+    } else {
+      throw new Error('hash function not implemented')
     }
-    this.chains = hashChains
   }
 }
 
@@ -57,7 +61,7 @@ function verifyChain(hashRoot, hashReveal, length, algorithm) {
   let hash = hashRoot
   if (hashFunction === 'keccak256') {
     for (let i = 0; i < iterations; i += 1) {
-      hash = keccak('keccak256').update(hash).digest('hex')
+      hash = keccak('keccak256').update(Buffer.from(hash, 'hex')).digest('hex')
     }
   } else {
     throw new Error('hash function not implemented')
@@ -65,6 +69,18 @@ function verifyChain(hashRoot, hashReveal, length, algorithm) {
   return (hash === hashReveal)
 }
 
+function mnemonicToHexstringSync(mnemonic) {
+  return bip39.mnemonicToSeedSync(mnemonic).toString('hex')
+}
+
+async function mnemonicToHexstring(mnemonic) {
+  return bip39.mnemonicToSeed(mnemonic).toString('hex')
+}
+
+function validateMnemonic(mnemonic) {
+  return bip39.validateMnemonic(mnemonic)
+}
+
 module.exports = {
-  HashChain, HashChains, verifyChain
+  HashChain, HashChains, verifyChain, mnemonicToHexstring, mnemonicToHexstringSync, validateMnemonic
 }
