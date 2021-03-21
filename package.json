@@ -1,6 +1,6 @@
 {
   "name": "@theqrl/hashchains",
-  "version": "0.3.1",
+  "version": "0.4.2",
   "description": "hashchains utilities",
   "main": "./dist/hashchains.cjs.js",
   "module": "./dist/hashchains.esm.js",
@@ -69,6 +69,7 @@
     "babel-eslint": "^10.1.0",
     "babel-plugin-istanbul": "^6.0.0",
     "browserify": "^17.0.0",
+    "buffer": "^6.0.3",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "coveralls": "^3.0.0",
@@ -88,6 +89,7 @@
     "rollup-plugin-node-polyfills": "^0.2.1"
   },
   "dependencies": {
+    "bip39": "^3.0.3",
     "keccak": "^3.0.1"
   }
 }
