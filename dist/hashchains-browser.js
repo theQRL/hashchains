@@ -29487,12 +29487,12 @@ const keccak = require('keccak')
 const bip39 = require('bip39')
 
 class HashChain {
-  constructor(hashRoot, hashFunction, length) {
-    this.hashRoot = hashRoot
+  constructor(hashReveal, hashFunction, length) {
+    this.hashReveal = hashReveal
     this.hashFunction = hashFunction || 'keccak256'
     this.length = parseInt(length, 10) || 64
     const hc = []
-    hc.push(this.hashRoot)
+    hc.push(this.hashReveal)
     for (let i = 0; i < this.length; i += 1) {
       if (this.hashFunction === 'keccak256') {
         const buf = Buffer.from(hc[i], 'hex')
@@ -29515,19 +29515,19 @@ class HashChains {
     const seedBuf = Buffer.from(seed, 'hex')
     const hashChains = []
     const hashChainRoots = []
-    let hashRoot = null
+    let hashReveal = null
     if (this.hashFunction === 'keccak256') {
       for (let i = 0; i < chainsToMake; i += 1) {
         const iBuf = Buffer.from(`${startingIndex + i}`)
-        hashRoot = keccak('keccak256')
+        hashReveal = keccak('keccak256')
           .update(Buffer.concat([seedBuf, iBuf]))
           .digest('hex')
-        hashChainRoots.push(hashRoot)
-        const hc = new HashChain(hashRoot)
+        hashChainRoots.push(hashReveal)
+        const hc = new HashChain(hashReveal)
         hashChains.push({
           index: startingIndex + i,
-          hashRoot,
-          hashReveal: hc[64],
+          hashReveal,
+          hashChainTerminator: hc[64],
           hashchain: hc,
         })
       }
@@ -29538,18 +29538,18 @@ class HashChains {
   }
 }
 
-function verifyChain(hashRoot, hashReveal, length, algorithm) {
+function verifyChain(hashReveal, hashChainTerminator, length, hashFunction) {
   const iterations = length || 64
-  const hashFunction = algorithm || 'keccak256'
-  let hash = hashRoot
-  if (hashFunction === 'keccak256') {
+  const algorithm = hashFunction || 'keccak256'
+  let hash = hashReveal
+  if (algorithm === 'keccak256') {
     for (let i = 0; i < iterations; i += 1) {
       hash = keccak('keccak256').update(Buffer.from(hash, 'hex')).digest('hex')
     }
   } else {
     throw new Error('hash function not implemented')
   }
-  return (hash === hashReveal)
+  return (hash === hashChainTerminator)
 }
 
 function mnemonicToHexstringSync(mnemonic) {

@@ -37,24 +37,24 @@ describe('make a hashchain', function () {
     const hc = new HashChains(mnemonic, 2, 2)
     expect(hc.chains[0].index).to.equal(2)
   })
-  it('from test mnemonic first hashchain should have a hashroot of 23bc...86a6', function () {
+  it('from test mnemonic first hashchain should have a hashReveal of 23bc...86a6', function () {
     const hc = new HashChains(mnemonic)
-    expect(hc.chains[0].hashRoot).to.equal('044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d')
+    expect(hc.chains[0].hashReveal).to.equal('044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d')
     expect(hc.chains[0].hashchain[0]).to.equal('044852b2a670ade5407e78fb2863c51de9fcb96542a07186fe3aeda6bb8a116d')
   })
-  it('from test mnemonic last hashchain should have a hashreveal of 22a4...26ba', function () {
+  it('from test mnemonic last hashchain should have a hashChainTerminator of 22a4...26ba', function () {
     const hc = new HashChains(mnemonic)
-    expect(hc.chains[0].hashReveal).to.equal('0bb58fdc4f70ecbe0fcbe0bd1a17a8878ceacb759db13501c1abc9d0838cd204')
+    expect(hc.chains[0].hashChainTerminator).to.equal('0bb58fdc4f70ecbe0fcbe0bd1a17a8878ceacb759db13501c1abc9d0838cd204')
     expect(hc.chains[0].hashchain[64]).to.equal('0bb58fdc4f70ecbe0fcbe0bd1a17a8878ceacb759db13501c1abc9d0838cd204')
   })
-  it('from test mnemonic correctly report hashReveal', function () {
+  it('from test mnemonic correctly report hashChainTerminator', function () {
     const hc = new HashChains(mnemonic)
-    expect(hc.chains[0].hashReveal).to.equal('0bb58fdc4f70ecbe0fcbe0bd1a17a8878ceacb759db13501c1abc9d0838cd204')
+    expect(hc.chains[0].hashChainTerminator).to.equal('0bb58fdc4f70ecbe0fcbe0bd1a17a8878ceacb759db13501c1abc9d0838cd204')
   })
   it('expect overlapping chains to have same data', function () {
     const hc = new HashChains(mnemonic, 5)
     const hc2 = new HashChains(mnemonic, 5, 4)
-    expect(hc.chains[4].hashRoot).to.equal(hc2.chains[0].hashRoot)
+    expect(hc.chains[4].hashReveal).to.equal(hc2.chains[0].hashReveal)
   })
   it('expect to throw when an unimplemented hash function is used', function () {
     expect(function () {
@@ -69,16 +69,16 @@ describe('make a hashchain', function () {
 describe('verify a hashchain', function () {
   it('valid chain should correctly verify', function () {
     const hc = new HashChains(mnemonic)
-    expect(verifyChain(hc.chains[0].hashRoot, hc.chains[0].hashReveal)).to.equal(true)
+    expect(verifyChain(hc.chains[0].hashReveal, hc.chains[0].hashChainTerminator)).to.equal(true)
   })
   it('valid chain will not verify with invalid length', function () {
     const hc = new HashChains(mnemonic)
-    expect(verifyChain(hc.chains[0].hashRoot, hc.chains[0].hashReveal, 65)).to.equal(false)
+    expect(verifyChain(hc.chains[0].hashReveal, hc.chains[0].hashChainTerminator, 65)).to.equal(false)
   })
   it('expect verify to throw if an invalid hashing algorithm is passed', function () {
     const hc = new HashChains(mnemonic)
     expect(function () {
-      const verify = verifyChain(hc.chains[0].hashRoot, hc.chains[0].hashReveal, 65, 'sha256') // eslint-disable-line
+      const verify = verifyChain(hc.chains[0].hashReveal, hc.chains[0].hashChainTerminator, 65, 'sha256') // eslint-disable-line
     }).to.throw()
   })
 })

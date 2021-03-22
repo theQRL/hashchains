@@ -46,14 +46,14 @@ var keccak = require('keccak');
 
 var bip39 = require('bip39');
 
-var HashChain = function HashChain(hashRoot, hashFunction, length) {
+var HashChain = function HashChain(hashReveal, hashFunction, length) {
   _classCallCheck(this, HashChain);
 
-  this.hashRoot = hashRoot;
+  this.hashReveal = hashReveal;
   this.hashFunction = hashFunction || 'keccak256';
   this.length = parseInt(length, 10) || 64;
   var hc = [];
-  hc.push(this.hashRoot);
+  hc.push(this.hashReveal);
 
   for (var i = 0; i < this.length; i += 1) {
     if (this.hashFunction === 'keccak256') {
@@ -77,17 +77,17 @@ var HashChains = function HashChains(seed, numberToCreate, index, hashFunction, 
   var chainsToMake = parseInt(numberToCreate, 10) || 2;
   var seedBuf = Buffer.from(seed, 'hex');
   var hashChains = [];
-  var hashRoot = null;
+  var hashReveal = null;
 
   if (this.hashFunction === 'keccak256') {
     for (var i = 0; i < chainsToMake; i += 1) {
       var iBuf = Buffer.from("".concat(startingIndex + i));
-      hashRoot = keccak('keccak256').update(Buffer.concat([seedBuf, iBuf])).digest('hex');
-      var hc = new HashChain(hashRoot);
+      hashReveal = keccak('keccak256').update(Buffer.concat([seedBuf, iBuf])).digest('hex');
+      var hc = new HashChain(hashReveal);
       hashChains.push({
         index: startingIndex + i,
-        hashRoot: hashRoot,
-        hashReveal: hc[64],
+        hashReveal: hashReveal,
+        hashChainTerminator: hc[64],
         hashchain: hc
       });
     }
@@ -98,12 +98,12 @@ var HashChains = function HashChains(seed, numberToCreate, index, hashFunction, 
   }
 };
 
-function verifyChain(hashRoot, hashReveal, length, algorithm) {
+function verifyChain(hashReveal, hashChainTerminator, length, hashFunction) {
   var iterations = length || 64;
-  var hashFunction = algorithm || 'keccak256';
-  var hash = hashRoot;
+  var algorithm = hashFunction || 'keccak256';
+  var hash = hashReveal;
 
-  if (hashFunction === 'keccak256') {
+  if (algorithm === 'keccak256') {
     for (var i = 0; i < iterations; i += 1) {
       hash = keccak('keccak256').update(Buffer.from(hash, 'hex')).digest('hex');
     }
@@ -111,7 +111,7 @@ function verifyChain(hashRoot, hashReveal, length, algorithm) {
     throw new Error('hash function not implemented');
   }
 
-  return hash === hashReveal;
+  return hash === hashChainTerminator;
 }
 
 function mnemonicToHexstringSync(mnemonic) {
