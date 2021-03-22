@@ -3,10 +3,10 @@
     <h1>HashChains demo</h1>
     <h2>Verify</h2>
     <form>
-      <label>HashRoot</label>
-      <input name="root" v-model="root" style="width: 100%" @input="verify()" />
-      <label>HashReveal / ChainTerminator</label>
-      <input name="reveal" v-model="reveal" style="width: 100%" @input="verify()" />
+      <label>HashReveal</label>
+      <input name="Reveal" v-model="Reveal" style="width: 100%" @input="verify()" />
+      <label>HashChainTerminator</label>
+      <input name="ChainTerminator" v-model="ChainTerminator" style="width: 100%" @input="verify()" />
     </form>
     <div style="margin-top: 10px;"><span class="validity" v-bind:class="{valid: valid, invalid: !valid}">{{ result() }}</span></div>
     <div style="height: 40px;"></div>
@@ -28,8 +28,8 @@
   <div v-if="this.validMnemonic">
     <h2>HashChain</h2>
     <h3>
-      <code>root: {{ this.chains[0].hashRoot }}</code>
-      <code>reveal: {{ this.chains[0].hashReveal }}</code>
+      <code>Reveal: {{ this.chains[0].hashReveal }}</code>
+      <code>ChainTerminator: {{ this.chains[0].hashChainTerminator }}</code>
     </h3>
 
     <code>
@@ -51,8 +51,8 @@ export default {
   data() {
     return {
       seed: "essay shadow creek eager legal just bench exchange miracle work grace vivid load shed genre angry success guide film spray hotel digital barrel grab",
-      root: "42bc241ba4045c96f6b71f999b3373942f2e7c031a7c11a3cbefb10d09971961",
-      reveal: "10373abc181dd10a4cf8e39703616f3c0187f26ccf64cb46eb060a8b0ac92f3f",
+      Reveal: "42bc241ba4045c96f6b71f999b3373942f2e7c031a7c11a3cbefb10d09971961",
+      ChainTerminator: "10373abc181dd10a4cf8e39703616f3c0187f26ccf64cb46eb060a8b0ac92f3f",
       index: 0,
       bip39hex: '0000',
       valid: false,
@@ -81,8 +81,8 @@ export default {
     },
     verify() {
       // only verify if valid hexstring
-      if (this.root.length % 2 === 0 && this.reveal.length % 2 === 0) {
-        this.valid = verifyChain(this.root, this.reveal)
+      if (this.Reveal.length % 2 === 0 && this.ChainTerminator.length % 2 === 0) {
+        this.valid = verifyChain(this.Reveal, this.ChainTerminator)
       } else {
         this.valid = false
       }

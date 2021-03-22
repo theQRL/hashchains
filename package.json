@@ -1,10 +1,8 @@
 {
   "name": "@theqrl/hashchains",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "hashchains utilities",
-  "main": "./dist/hashchains.cjs.js",
-  "module": "./dist/hashchains.esm.js",
-  "browser": "./dist/hashchains.umd.js",
+  "main": "dist/hashchains.esm.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/theqrl/hashchains"

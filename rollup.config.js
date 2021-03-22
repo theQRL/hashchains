@@ -1,5 +1,4 @@
 import resolve from '@rollup/plugin-node-resolve'
-import commonjs from '@rollup/plugin-commonjs'
 import babel from '@rollup/plugin-babel'
 import nodePolyfills from 'rollup-plugin-node-polyfills'
 import pkg from './package.json'
@@ -20,7 +19,6 @@ export default [
     plugins: [
       resolve(),
       nodePolyfills(),
-      commonjs(),
       babel({
         ...babelCommonOptions,
         presets: [
@@ -49,30 +47,8 @@ export default [
   {
     input: 'src/index.js',
     plugins: [
-      babel({
-        ...babelCommonOptions,
-        presets: [
-          [
-            '@babel/preset-env',
-            {
-              targets: {
-                browsers: ['last 2 versions'],
-              },
-              modules: false,
-            },
-          ],
-        ],
-      }),
-    ].filter(Boolean),
-    output: {
-      banner,
-      file: pkg.main,
-      format: 'cjs',
-    },
-  },
-  {
-    input: 'src/index.js',
-    plugins: [
+      resolve(),
+      nodePolyfills(),
       babel({
         ...babelCommonOptions,
         presets: [
