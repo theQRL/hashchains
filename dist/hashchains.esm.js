@@ -1,4 +1,4 @@
-/* @theqrl/hashchains v0.4.2 - Copyright (C) Die QRL Stiftung. License: MIT */
+/* @theqrl/hashchains v0.6.1 - Copyright (C) Die QRL Stiftung. License: MIT */
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
     var info = gen[key](arg);
@@ -52,10 +52,11 @@ var HashChain = function HashChain(hashReveal, hashFunction, length) {
   this.hashReveal = hashReveal;
   this.hashFunction = hashFunction || 'keccak256';
   this.length = parseInt(length, 10) || 64;
+  var l = this.length;
   var hc = [];
   hc.push(this.hashReveal);
 
-  for (var i = 0; i < this.length; i += 1) {
+  for (var i = 0; i < l; i += 1) {
     if (this.hashFunction === 'keccak256') {
       var buf = Buffer.from(hc[i], 'hex');
       hc.push(keccak('keccak256').update(buf).digest('hex'));
@@ -73,6 +74,7 @@ var HashChains = function HashChains(seed, numberToCreate, index, hashFunction, 
 
   this.hashFunction = hashFunction || 'keccak256';
   this.length = parseInt(length, 10) || 64;
+  var l = this.length;
   var startingIndex = parseInt(index, 10) || 0;
   var chainsToMake = parseInt(numberToCreate, 10) || 2;
   var seedBuf = Buffer.from(seed, 'hex');
@@ -83,11 +85,11 @@ var HashChains = function HashChains(seed, numberToCreate, index, hashFunction, 
     for (var i = 0; i < chainsToMake; i += 1) {
       var iBuf = Buffer.from("".concat(startingIndex + i));
       hashReveal = keccak('keccak256').update(Buffer.concat([seedBuf, iBuf])).digest('hex');
-      var hc = new HashChain(hashReveal);
+      var hc = new HashChain(hashReveal, this.hashFunction, l);
       hashChains.push({
         index: startingIndex + i,
         hashReveal: hashReveal,
-        hashChainTerminator: hc[64],
+        hashChainTerminator: hc[l],
         hashchain: hc
       });
     }

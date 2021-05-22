@@ -29491,9 +29491,10 @@ class HashChain {
     this.hashReveal = hashReveal
     this.hashFunction = hashFunction || 'keccak256'
     this.length = parseInt(length, 10) || 64
+    const l = this.length
     const hc = []
     hc.push(this.hashReveal)
-    for (let i = 0; i < this.length; i += 1) {
+    for (let i = 0; i < l; i += 1) {
       if (this.hashFunction === 'keccak256') {
         const buf = Buffer.from(hc[i], 'hex')
         hc.push(keccak('keccak256').update(buf).digest('hex'))
@@ -29510,6 +29511,7 @@ class HashChains {
   constructor(seed, numberToCreate, index, hashFunction, length) {
     this.hashFunction = hashFunction || 'keccak256'
     this.length = parseInt(length, 10) || 64
+    const l = this.length
     const startingIndex = parseInt(index, 10) || 0
     const chainsToMake = parseInt(numberToCreate, 10) || 2
     const seedBuf = Buffer.from(seed, 'hex')
@@ -29523,11 +29525,11 @@ class HashChains {
           .update(Buffer.concat([seedBuf, iBuf]))
           .digest('hex')
         hashChainRoots.push(hashReveal)
-        const hc = new HashChain(hashReveal, this.hashFunction, this.length)
+        const hc = new HashChain(hashReveal, this.hashFunction, l)
         hashChains.push({
           index: startingIndex + i,
           hashReveal,
-          hashChainTerminator: hc[this.length],
+          hashChainTerminator: hc[l],
           hashchain: hc,
         })
       }
