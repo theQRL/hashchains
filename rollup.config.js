@@ -40,7 +40,7 @@ export default [
       },
       banner,
       name: 'HashChains',
-      file: pkg.browser,
+      file: pkg.umd,
       format: 'umd',
     },
   },
@@ -67,7 +67,7 @@ export default [
     output: {
       banner,
       format: 'es',
-      file: pkg.module,
+      file: pkg.esm,
     },
   },
 ]
