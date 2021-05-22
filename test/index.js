@@ -69,6 +69,11 @@ describe('make a hashchain', function () {
       const hc = new HashChain(mnemonic, 'keccak256', 0) // eslint-disable-line
     }).to.not.throw()
   })
+  it('expect not to default to keccak256 for single chain', function () {
+    expect(function () {
+      const hc = new HashChain(mnemonic, undefined , 0) // eslint-disable-line
+    }).to.not.throw()
+  })
   it('expect chain with created with a length parameter of 3 to be correctly created', function () {
     const hc = new HashChains(mnemonic, 1, 0, undefined, 3)
     expect(hc.chains[0].hashchain.length).to.equal(4)
