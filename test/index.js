@@ -25,11 +25,11 @@ describe('test esm build', function () {
 })
 
 describe('make a hashchain', function () {
-  it('2 chains should be created if called without length parameter', function () {
+  it('2 chains should be created if called without quantity parameter', function () {
     const hc = new HashChains(mnemonic)
     expect(hc.chains.length).to.equal(2)
   })
-  it('20 chains should be created if called with a length parameter of 20', function () {
+  it('20 chains should be created if called with a quantity parameter of 20', function () {
     const hc = new HashChains(mnemonic, 20)
     expect(hc.chains.length).to.equal(20)
   })
@@ -61,8 +61,25 @@ describe('make a hashchain', function () {
       const hc = new HashChains(mnemonic, 5, 0, 'sha256') // eslint-disable-line
     }).to.throw()
     expect(function () {
-      const hc = new HashChain(mnemonic, 5, 0, 'sha256') // eslint-disable-line
+      const hc = new HashChain(mnemonic, 'sha256', 0) // eslint-disable-line
     }).to.throw()
+  })
+  it('expect not to throw when an implemented hash function is used for single chain', function () {
+    expect(function () {
+      const hc = new HashChain(mnemonic, 'keccak256', 0) // eslint-disable-line
+    }).to.not.throw()
+  })
+  it('expect chain with created with a length parameter of 3 to be correctly created', function () {
+    const hc = new HashChains(mnemonic, 1, 0, undefined, 3)
+    expect(hc.chains[0].hashchain.length).to.equal(4)
+  })
+  it('expect chain with created with a length parameter of 2 to be correctly created', function () {
+    const hc = new HashChains(mnemonic, 1, 0, undefined, 2)
+    expect(hc.chains[0].hashchain.length).to.equal(3)
+  })
+  it('expect chain with created with a length parameter of 1 to be correctly created', function () {
+    const hc = new HashChains(mnemonic, 1, 0, undefined, 1)
+    expect(hc.chains[0].hashchain.length).to.equal(2)
   })
 })
 

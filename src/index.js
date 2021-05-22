@@ -40,11 +40,11 @@ class HashChains {
           .update(Buffer.concat([seedBuf, iBuf]))
           .digest('hex')
         hashChainRoots.push(hashReveal)
-        const hc = new HashChain(hashReveal)
+        const hc = new HashChain(hashReveal, this.hashFunction, this.length)
         hashChains.push({
           index: startingIndex + i,
           hashReveal,
-          hashChainTerminator: hc[64],
+          hashChainTerminator: hc[this.length],
           hashchain: hc,
         })
       }
